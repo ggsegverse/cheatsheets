@@ -1,0 +1,25 @@
+/* Fira Code renders |> and <- as single arrow glyphs through contextual
+   alternates. Turned off so R code reads as it is typed. */
+code,
+pre,
+pre code,
+.sourceCode {
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0;
+}
+
+.sheet-pdf-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.sheet-pdf-link p {
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.sheet-pdf-link img {
+  border: 1px solid var(--bs-border-color, #cec4cc);
+  border-radius: 3px;
+}

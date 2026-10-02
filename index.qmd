@@ -1,0 +1,36 @@
+---
+title: "ggsegverse cheatsheets"
+subtitle: "Quick references for plotting brain atlases in R"
+format:
+  html:
+    toc: false
+---
+
+Three sheets covering the [ggsegverse](https://ggsegverse.github.io). Each one
+is a two-page PDF for printing and an accessible HTML page for reading, built
+from the same source, with every example executed against the real packages.
+
+## The sheets
+
+| Sheet | Covers | |
+|-------|--------|---|
+| [2D brain plotting with ggseg](ggseg.qmd) | `geom_brain()`, view arrangement, palettes, themes | [PDF](ggseg.pdf) |
+| [3D brain plotting with ggseg3d](ggseg3d.qmd) | `ggseg3d()`, cameras, surfaces, Shiny | [PDF](ggseg3d.pdf) |
+| [Brain atlases and data structures](ggseg-atlases.qmd) | installing atlases, `ggseg_atlas` objects, atlas verbs | [PDF](ggseg-atlases.pdf) |
+
+## Getting the packages
+
+```r
+options(repos = c(
+  ggsegverse = "https://ggsegverse.r-universe.dev",
+  CRAN = "https://cloud.r-project.org"
+))
+
+install.packages("ggsegverse")
+```
+
+## Licence
+
+These sheets are released under
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Share them,
+adapt them, teach from them --- keep the attribution and the licence.

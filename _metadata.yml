@@ -1,0 +1,22 @@
+# Directory metadata shared by every cheatsheet.
+#
+# These keys must be document metadata rather than format options: Quarto
+# forwards document metadata to the Typst template partials, but not arbitrary
+# keys declared under `format:` in _quarto.yml.
+
+author: "Athanasia Monika Mowinckel"
+
+sheet-url: "https://ggsegverse.github.io/cheatsheets"
+sheet-license: "CC BY-SA 4.0"
+sheet-logo: "images/logo_light.png"
+sheet-columns: 3
+sheet-base-size: 7.6pt
+sheet-primary: "29393e"
+sheet-secondary: "5e3c58"
+sheet-accent: "a8c5cb"
+sheet-muted: "cec4cc"
+sheet-surface: "f2f0ef"
+sheet-foreground: "1a2a2e"
+sheet-body-font: "Source Serif 4"
+sheet-heading-font: "Montserrat"
+sheet-mono-font: "Fira Code"

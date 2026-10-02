@@ -1,0 +1,14 @@
+/.quarto/
+
+# Intermediate Typst and figure output; the PDFs in pdf/ and the site in docs/
+# are the artefacts worth keeping.
+/*.typ
+/*_files/
+/site_libs/
+
+.Rproj.user
+.Rhistory
+
+**/*.quarto_ipynb
+
+.DS_Store

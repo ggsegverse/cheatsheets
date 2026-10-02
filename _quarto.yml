@@ -1,0 +1,57 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "*.qmd"
+  post-render:
+    - tools/collect-pdfs.R
+
+website:
+  title: "ggsegverse cheatsheets"
+  site-url: https://ggsegverse.github.io/cheatsheets
+  repo-url: https://github.com/ggsegverse/cheatsheets
+  repo-actions: [edit, issue]
+  favicon: images/favico.png
+  navbar:
+    logo: images/submark_light.png
+    logo-alt: "ggsegverse"
+    logo-href: https://ggsegverse.github.io
+    left:
+      - href: index.qmd
+        text: Cheatsheets
+    right:
+      - icon: github
+        href: https://github.com/ggsegverse/cheatsheets
+        aria-label: GitHub
+  page-footer:
+    center: "CC BY-SA 4.0 · Athanasia Monika Mowinckel"
+
+format:
+  html:
+    theme:
+      - brand
+    css: styles.css
+    toc: true
+    toc-location: left
+    code-copy: true
+    code-overflow: wrap
+    highlight-style:
+      light: a11y-light
+      dark: a11y-dark
+    link-external-newwindow: true
+  cheatsheet-typst: default
+
+execute:
+  eval: true
+  echo: true
+  warning: false
+  message: false
+  freeze: auto
+
+knitr:
+  opts_chunk:
+    comment: "#>"
+    collapse: true
+    dev: png
+    dpi: 300
+    fig.align: center

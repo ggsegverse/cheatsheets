@@ -1,0 +1,20 @@
+title: ggsegverse Cheatsheet
+author: Athanasia Monika Mowinckel
+version: 0.1.0
+quarto-required: ">=1.5.0"
+contributes:
+  formats:
+    typst:
+      template-partials:
+        - typst-show.typ
+        - typst-template.typ
+      papersize: a4
+      keep-typ: true
+      toc: false
+      number-sections: false
+      fig-format: png
+      fig-dpi: 300
+      font-paths:
+        - fonts
+      mainfont: Source Serif 4
+      cite-method: citeproc

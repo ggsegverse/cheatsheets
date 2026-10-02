@@ -1,0 +1,387 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ggsegverse cheatsheets",
+    "section": "",
+    "text": "Three sheets covering the ggsegverse. Each one is a two-page PDF for printing and an accessible HTML page for reading, built from the same source, with every example executed against the real packages."
+  },
+  {
+    "objectID": "index.html#the-sheets",
+    "href": "index.html#the-sheets",
+    "title": "ggsegverse cheatsheets",
+    "section": "The sheets",
+    "text": "The sheets\n\n\n\nSheet\nCovers\n\n\n\n\n\n2D brain plotting with ggseg\ngeom_brain(), view arrangement, palettes, themes\nPDF\n\n\n3D brain plotting with ggseg3d\nggseg3d(), cameras, surfaces, Shiny\nPDF\n\n\nBrain atlases and data structures\ninstalling atlases, ggseg_atlas objects, atlas verbs\nPDF"
+  },
+  {
+    "objectID": "index.html#getting-the-packages",
+    "href": "index.html#getting-the-packages",
+    "title": "ggsegverse cheatsheets",
+    "section": "Getting the packages",
+    "text": "Getting the packages\noptions(repos = c(\n  ggsegverse = \"https://ggsegverse.r-universe.dev\",\n  CRAN = \"https://cloud.r-project.org\"\n))\n\ninstall.packages(\"ggsegverse\")"
+  },
+  {
+    "objectID": "index.html#licence",
+    "href": "index.html#licence",
+    "title": "ggsegverse cheatsheets",
+    "section": "Licence",
+    "text": "Licence\nThese sheets are released under CC BY-SA 4.0. Share them, adapt them, teach from them — keep the attribution and the licence."
+  },
+  {
+    "objectID": "ggseg.html",
+    "href": "ggseg.html",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "",
+    "text": "Download PDF"
+  },
+  {
+    "objectID": "ggseg.html#one-layer-one-atlas",
+    "href": "ggseg.html#one-layer-one-atlas",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "One layer, one atlas",
+    "text": "One layer, one atlas\nggseg adds a single layer type to ggplot2. An atlas supplies the geometry, your data supplies the values.\n\nlibrary(ggseg)\nlibrary(ggplot2)\n\nggplot() +\n  geom_brain(atlas = dk()) +\n  theme_void()\n\n\n\n\n\n\n\n\n\nAtlases are functions: call dk(), not dk.\nRegions are grey until you map fill — see Atlas palettes.\ntheme_void() removes the coordinate axes, which a brain plot has no use for.\n\ngeom_brain(\n  mapping = aes(), data = NULL, atlas,\n  hemi = NULL, view = NULL,\n  position = position_brain(),\n  context = TRUE, fun = mean, ...\n)"
+  },
+  {
+    "objectID": "ggseg.html#atlases-that-ship-with-ggseg",
+    "href": "ggseg.html#atlases-that-ship-with-ggseg",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Atlases that ship with ggseg",
+    "text": "Atlases that ship with ggseg\n\n\n\nAtlas\nType\nCovers\n\n\n\n\ndk()\ncortical\nDesikan-Killiany, 35 regions per hemisphere\n\n\naseg()\nsubcortical\nFreeSurfer automatic segmentation\n\n\nsuit()\ncerebellar\nSUIT cerebellar parcellation\n\n\ntracula()\ntract\nTRACULA white-matter tracts\n\n\n\nDozens more install from the ggsegverse r-universe — see the atlases and data structures sheet.\nAccessors live in ggseg.formats, which ggseg loads but does not re-export:\n\nlibrary(ggseg.formats)\n\natlas_regions(dk())\natlas_labels(dk())\natlas_views(dk())\natlas_type(dk())"
+  },
+  {
+    "objectID": "ggseg.html#your-data-on-the-brain",
+    "href": "ggseg.html#your-data-on-the-brain",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Your data on the brain",
+    "text": "Your data on the brain\nGive ggplot() a data frame with a region or label column. geom_brain() joins it to the atlas, so you only name the regions you actually have.\n\nscores &lt;- data.frame(\n  region = c(\"precentral\", \"insula\", \"fusiform\"),\n  score = c(1.2, -0.4, 0.8)\n)\n\nggplot(scores) +\n  geom_brain(atlas = dk(), aes(fill = score)) +\n  scale_fill_gradient2() +\n  theme_void()\n\n\n\n\n\n\n\n\n\nRegions absent from your data are filled with na.value — grey by default.\nJoin on label (lh_precentral) to colour one hemisphere only.\nfun = mean collapses several rows that share a region.\nbrain_join(data, atlas, by = NULL) returns the merged table instead of a plot, when you want to inspect the join."
+  },
+  {
+    "objectID": "ggseg.html#facet-by-a-grouping-variable",
+    "href": "ggseg.html#facet-by-a-grouping-variable",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Facet by a grouping variable",
+    "text": "Facet by a grouping variable\nEach facet gets a whole brain, so one plot can carry several contrasts.\n\nlong &lt;- data.frame(\n  region = rep(c(\"precentral\", \"insula\", \"fusiform\"), 2),\n  score = c(1.2, -0.4, 0.8, -1.1, 0.2, 1.6),\n  session = rep(c(\"pre\", \"post\"), each = 3)\n)\n\nggplot(long) +\n  geom_brain(atlas = dk(), aes(fill = score)) +\n  facet_wrap(~session) +\n  theme_void()"
+  },
+  {
+    "objectID": "ggseg.html#position_brain",
+    "href": "ggseg.html#position_brain",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "position_brain()",
+    "text": "position_brain()\nposition_brain() decides where hemispheres and views sit. For cortical atlases, pass a formula of rows ~ columns.\n\nggplot() +\n  geom_brain(\n    atlas = dk(),\n    position = position_brain(hemi ~ view)\n  ) +\n  theme_void()\n\n\n\n\n\n\n\n\n\n\n\nFormula\nLayout\n\n\n\n\nhemi ~ view\nhemispheres in rows, views in columns\n\n\nview ~ hemi\nviews in rows, hemispheres in columns\n\n\n. ~ view + hemi\na single row, every panel side by side\n\n\nhemi + view ~ .\na single column, stacked\n\n\n\n\nZooming and trimming\n\n# zoom each view onto its focus regions\nposition_brain(hemi ~ view, zoom = TRUE)\n\n# zoom onto named regions, with 10% padding\nposition_brain(hemi ~ view, zoom = \"insula\", zoom_pad = 0.1)\n\n# keep only these views, in this order\nposition_brain(views = c(\"lateral\", \"medial\"))\n\nSubcortical and tract atlases have slice views rather than hemispheres, so they take \"horizontal\", \"vertical\", nrow or ncol instead:\n\nggplot() +\n  geom_brain(\n    atlas = aseg(),\n    position = position_brain(\"horizontal\", nrow = 2)\n  ) +\n  theme_void()\n\n\n\n\n\n\n\n\n\n\nPicking hemispheres and views directly\n\ngeom_brain(atlas = dk(), hemi = \"left\")\ngeom_brain(atlas = dk(), view = \"lateral\")\n\nreposition_brain(data, position, ...) rearranges an already-joined atlas table, and coord_brain(ratio = 1) fixes the aspect ratio by hand."
+  },
+  {
+    "objectID": "ggseg.html#atlas-palettes",
+    "href": "ggseg.html#atlas-palettes",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Atlas palettes",
+    "text": "Atlas palettes\nEvery atlas carries the colours its parcellation is normally drawn in. They are not applied automatically: map fill to label and hand the palette to scale_fill_manual().\n\nggplot() +\n  geom_brain(\n    atlas = dk(),\n    aes(fill = label),\n    show.legend = FALSE\n  ) +\n  scale_fill_manual(values = dk()$palette) +\n  theme_void()\n\n\n\n\n\n\n\n\natlas_palette(dk()) returns the same named vector, and atlas_plot_palette(dk()) draws it as a swatch."
+  },
+  {
+    "objectID": "ggseg.html#your-own-colours",
+    "href": "ggseg.html#your-own-colours",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Your own colours",
+    "text": "Your own colours\n\npal &lt;- c(\n  precentral = \"#5e3c58\",\n  insula = \"#a8c5cb\"\n)\n\nggplot() +\n  geom_brain(\n    atlas = dk(),\n    aes(fill = region),\n    show.legend = FALSE\n  ) +\n  scale_fill_brain_manual(pal, na.value = \"grey90\") +\n  theme_void()\n\n\nscale_fill_brain_manual(palette, na.value) — fill.\nscale_colour_brain_manual() / scale_color_brain_manual() — outlines.\nscale_brain_manual(palette, aesthetics) — both at once.\n\nFor continuous values, use ggplot2’s own scales: scale_fill_viridis_c(), scale_fill_gradient2(), scale_fill_distiller().\n\nDeprecated. scale_fill_brain(), scale_brain() and the *_brain2() family are superseded. Use scale_fill_manual() with atlas$palette, or the *_brain_manual() functions above."
+  },
+  {
+    "objectID": "ggseg.html#themes",
+    "href": "ggseg.html#themes",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Themes",
+    "text": "Themes\n\ntheme_brain(text.size = 12, text.family = \"mono\")\ntheme_darkbrain(text.size = 12)\ntheme_brain2(\n  plot.background = \"white\",\n  text.colour = \"darkgrey\"\n)\ntheme_custombrain(\n  plot.background = \"white\",\n  text.colour = \"darkgrey\",\n  text.size = 12\n)\n\nThese keep the axes and style the surround; theme_darkbrain() is the one for dark slides. ggplot2::theme_void() is the right choice when you want nothing but the brain."
+  },
+  {
+    "objectID": "ggseg.html#naming-the-views",
+    "href": "ggseg.html#naming-the-views",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Naming the views",
+    "text": "Naming the views\n\npos &lt;- position_brain(hemi ~ view)\n\nggplot() +\n  geom_brain(atlas = dk(), position = pos) +\n  annotate_brain(dk(), position = pos, size = 1.5) +\n  theme_void()\n\n\n\n\n\n\n\n\n\nannotate_brain() writes the view name (“left lateral”) above each view. Pass it the same position you gave geom_brain().\nSubcortical and tract atlases get the raw view name instead (“axial_1”, “sagittal”).\nscale_labs_brain() and scale_continous_brain() put hemisphere and view labels on the axes in place of coordinates.\nRegion names are not drawn by any of these — use geom_sf_text() on as_sf_atlas(dk()) if you need them."
+  },
+  {
+    "objectID": "ggseg.html#checking-an-atlas",
+    "href": "ggseg.html#checking-an-atlas",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Checking an atlas",
+    "text": "Checking an atlas\n\nplot(dk())\nbrain_test_plot(\n  dk(),\n  position = position_brain(hemi ~ view)\n)\n\nBoth draw every region in its palette colour — the quickest way to see whether a new or edited atlas renders."
+  },
+  {
+    "objectID": "ggseg.html#gotchas",
+    "href": "ggseg.html#gotchas",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Gotchas",
+    "text": "Gotchas\n\ndk is a function; dk() is the atlas. The missing parentheses are the most common error.\nA brain with no fill mapping is grey by design, not broken.\nA region named in your data but missing from the atlas fails silently; check with setdiff(data$region, atlas_regions(dk())).\ncontext = FALSE drops the greyed-out surrounding structures that subcortical atlases draw for anatomical context.\ngeom_brain_sf() and position_brain_sf() are deprecated; geom_brain() is the polygon default, and as_sf_atlas() gives you sf geometry for geom_sf()."
+  },
+  {
+    "objectID": "ggseg.html#learn-more",
+    "href": "ggseg.html#learn-more",
+    "title": "2D brain plotting with ggseg :: Cheatsheet",
+    "section": "Learn more",
+    "text": "Learn more\n\nhttps://ggsegverse.github.io — ecosystem documentation\nvignette(\"ggseg\") — longer worked examples\nhttps://github.com/ggsegverse — source and issues"
+  },
+  {
+    "objectID": "ggseg-atlases.html",
+    "href": "ggseg-atlases.html",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "",
+    "text": "Download PDF"
+  },
+  {
+    "objectID": "ggseg-atlases.html#the-ecosystem",
+    "href": "ggseg-atlases.html#the-ecosystem",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "The ecosystem",
+    "text": "The ecosystem\n\n\n\nPackage\nHolds\n\n\n\n\nggseg.formats\nthe atlas class, verbs and FreeSurfer I/O\n\n\nggseg\n2D plotting (geom_brain())\n\n\nggseg3d\n3D plotting (htmlwidget)\n\n\nggseg.meshes\nextra cortical and cerebellar surfaces\n\n\nggseg.extra\nbuilding new atlases, needs FreeSurfer\n\n\nggsegverse\ninstalls and loads the lot\n\n\n\ndk(), aseg(), suit() and tracula() ship inside ggseg and ggseg3d. Everything else lives in its own package on the r-universe."
+  },
+  {
+    "objectID": "ggseg-atlases.html#installing",
+    "href": "ggseg-atlases.html#installing",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Installing",
+    "text": "Installing\n\noptions(repos = c(\n  ggsegverse = \"https://ggsegverse.r-universe.dev\",\n  CRAN = \"https://cloud.r-project.org\"\n))\n\ninstall.packages(\"ggsegverse\")\n\n\nlibrary(ggsegverse)\n\nggseg_atlas_repos()          # everything available\nggseg_atlas_repos(\"schaefer\") # matching a pattern\ninstalled_ggseg_atlases()    # what you already have\n\ninstall_ggseg_atlas(\"ggsegYeo2011\")\ninstall_ggseg_atlas_all()    # all of them, a large download\n\n\nggsegverse_packages()  # core packages\nggsegverse_deps()      # versions, and what is behind\nggsegverse_update()    # update the ones that are\nggsegverse_conflicts() # masked function names\nggsegverse_sitrep()    # one report covering all of it\n\nAtlas packages follow the same shape: library(ggsegYeo2011) then yeo7(), and every atlas is a function."
+  },
+  {
+    "objectID": "ggseg-atlases.html#anatomy",
+    "href": "ggseg-atlases.html#anatomy",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Anatomy",
+    "text": "Anatomy\n\nlibrary(ggseg)\nlibrary(ggseg.formats)\n\nnames(dk())\n#&gt; atlas, type, palette, core, data\nclass(dk())\n#&gt; cortical_atlas, ggseg_atlas, list\n\n\n\n\nSlot\nHolds\n\n\n\n\natlas\nthe atlas name\n\n\ntype\ncortical, subcortical, cerebellar or tract\n\n\ncore\none row per region: hemi, region, label\n\n\ndata\nthe geometry, keyed on label\n\n\npalette\nnamed vector of colours, one per label\n\n\n\ncore carries the metadata, data the drawing instructions, and the two are cross-checked on construction. Extra core columns (lobe, names) ride along and are available to aes()."
+  },
+  {
+    "objectID": "ggseg-atlases.html#what-goes-in-data",
+    "href": "ggseg-atlases.html#what-goes-in-data",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "What goes in data",
+    "text": "What goes in data\n\n\n\n\n\n\n\n\nType\nConstructor\nContains\n\n\n\n\ncortical\nggseg_data_cortical()\npolygons + vertex indices\n\n\nsubcortical\nggseg_data_subcortical()\npolygons + one mesh per region\n\n\ncerebellar\nggseg_data_cortical()\nflatmap polygons + SUIT vertices\n\n\ntract\nggseg_data_tract()\ncentrelines + tangents\n\n\n\nVertex indices are 0-based and point into the shared brain mesh."
+  },
+  {
+    "objectID": "ggseg-atlases.html#inspecting",
+    "href": "ggseg-atlases.html#inspecting",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Inspecting",
+    "text": "Inspecting\n\natlas_regions(dk())\natlas_labels(dk())\natlas_views(dk())\natlas_type(dk())\natlas_geom(dk())\natlas_vertices(dk())\natlas_palette(dk())\natlas_geometry_type(dk())\n\n\nis_ggseg_atlas(dk())\nis_cortical_atlas(dk())\nis_subcortical_atlas(aseg())\nis_cerebellar_atlas(suit())\nis_tract_atlas(tracula())\n\nplot(dk()) and atlas_plot_palette(dk()) show the regions and the colours."
+  },
+  {
+    "objectID": "ggseg-atlases.html#regions",
+    "href": "ggseg-atlases.html#regions",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Regions",
+    "text": "Regions\nEvery verb takes an atlas and returns an atlas, so they pipe.\n\ndk() |&gt;\n  atlas_region_keep(\"precentral\") |&gt;\n  atlas_regions()\n\n\n\n\nVerb\nDoes\n\n\n\n\natlas_region_keep()\nkeep matching regions\n\n\natlas_region_remove()\ndrop matching regions\n\n\natlas_region_rename()\nrename, pattern to replacement\n\n\natlas_region_contextual()\nmark as background context\n\n\natlas_region_op()\nthe general form behind these\n\n\natlas_core_add()\nadd columns to core\n\n\n\nAll take (atlas, pattern) and match on region; pass match_on = \"label\" to act per hemisphere."
+  },
+  {
+    "objectID": "ggseg-atlases.html#views",
+    "href": "ggseg-atlases.html#views",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Views",
+    "text": "Views\n\ndk() |&gt;\n  atlas_view_keep(c(\"lateral\", \"medial\")) |&gt;\n  atlas_views()\n\n\n\n\nVerb\nDoes\n\n\n\n\natlas_view_keep()\nkeep these views\n\n\natlas_view_remove()\ndrop these views\n\n\natlas_view_reorder()\nset the order\n\n\natlas_view_select()\nkeep one view per region\n\n\natlas_view_gather()\nmerge views into one\n\n\natlas_view_remove_region()\ndrop a region from one view\n\n\natlas_view_remove_small()\ndrop slivers below a threshold\n\n\n\natlas_structure_reorder() sets the order regions are drawn in."
+  },
+  {
+    "objectID": "ggseg-atlases.html#palettes",
+    "href": "ggseg-atlases.html#palettes",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Palettes",
+    "text": "Palettes\n\npal &lt;- atlas_palette(dk())\nhead(pal, 3)\n\npal[\"lh_precentral\"] &lt;- \"#5e3c58\"\nnew_atlas &lt;- set_atlas_palette(dk(), pal)\n\nA palette must name every label in the atlas, so edit the existing vector rather than passing a short one. Set the type explicitly with set_atlas_type(atlas, \"cortical\") when an atlas you have built guesses wrong."
+  },
+  {
+    "objectID": "ggseg-atlases.html#brain-meshes",
+    "href": "ggseg-atlases.html#brain-meshes",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Brain meshes",
+    "text": "Brain meshes\n\nget_brain_mesh(\"lh\", surface = \"inflated\")\nget_cerebellar_mesh()\n\nggseg.meshes::get_cortical_mesh(\"lh\", \"pial\")\nggseg.meshes::get_cerebellar_flatmap()\n\nEach mesh is a list of vertices (x, y, z) and faces (i, j, k), at fsaverage5 resolution — 10,242 vertices per hemisphere. The inflated surface ships in ggseg.formats; the rest in ggseg.meshes."
+  },
+  {
+    "objectID": "ggseg-atlases.html#reading-freesurfer-output",
+    "href": "ggseg-atlases.html#reading-freesurfer-output",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Reading FreeSurfer output",
+    "text": "Reading FreeSurfer output\n\nread_freesurfer_stats(\"lh.aparc.stats\")\nread_freesurfer_table(\"aseg.stats\")\n\nread_atlas_files(\"path/to/atlas\")\nmigrate_atlas_files(\"old/\", \"new/\")\n\nread_freesurfer_stats(path, rename = TRUE) tidies the column names into something that joins straight onto an atlas."
+  },
+  {
+    "objectID": "ggseg-atlases.html#converting-and-migrating",
+    "href": "ggseg-atlases.html#converting-and-migrating",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Converting and migrating",
+    "text": "Converting and migrating\n\nas_ggseg_atlas(x)      # anything -&gt; ggseg_atlas\nas_sf_atlas(dk())      # geometry as sf\nas_polygon_atlas(x)    # geometry as polygons\nconvert_legacy_brain_atlas(old)\n\n\nRenamed in 0.1–0.2. brain_regions(), brain_labels() and brain_views() became atlas_regions(), atlas_labels() and atlas_views(); brain_atlas() became ggseg_atlas(); is_brain_atlas() and as_brain_atlas() became is_ggseg_atlas() and as_ggseg_atlas(). The old names still work and warn."
+  },
+  {
+    "objectID": "ggseg-atlases.html#building-a-new-atlas",
+    "href": "ggseg-atlases.html#building-a-new-atlas",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Building a new atlas",
+    "text": "Building a new atlas\nggseg.extra turns neuroimaging files into atlases. It needs FreeSurfer on the path.\n\nlibrary(ggseg.extra)\n\ncreate_cortical_from_annotation(\"lh.aparc.annot\")\ncreate_cortical_from_gifti(...)\ncreate_cortical_from_cifti(...)\ncreate_subcortical_from_volume(\"aseg.mgz\")\ncreate_cerebellar_from_volume(...)\ncreate_tract_from_tractography(...)\ncreate_wholebrain_from_volume(...)\n\nThen tidy the result with atlas_smooth(), atlas_simplify(), atlas_dilate() and atlas_polish(), and set up a package for it with setup_atlas_repo() and use_atlas_github_actions(). sitrep() reports whether the external tools it needs are present."
+  },
+  {
+    "objectID": "ggseg-atlases.html#does-it-render",
+    "href": "ggseg-atlases.html#does-it-render",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Does it render?",
+    "text": "Does it render?\n\nlibrary(ggplot2)\n\ndk() |&gt;\n  atlas_region_keep(\"temporal\") |&gt;\n  brain_test_plot(\n    position = position_brain(hemi ~ view)\n  )\n\n\n\n\n\n\n\n\nbrain_test_plot() draws every region in its palette colour, so a region that has lost its geometry shows up as a hole. plot(atlas) is the quick version, and atlas_plot_palette(atlas) shows the colours on their own."
+  },
+  {
+    "objectID": "ggseg-atlases.html#validation",
+    "href": "ggseg-atlases.html#validation",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Validation",
+    "text": "Validation\nggseg_atlas() checks on construction that:\n\ntype is one of the four known types\ncore has hemi, region and label\nevery label in data appears in core, and the reverse\nthe data container matches the declared type\n\nA mismatch is a cli error naming the offending labels, not a silent coercion. is_ggseg_atlas() and the per-type predicates are the cheap checks to run first."
+  },
+  {
+    "objectID": "ggseg-atlases.html#what-an-atlas-package-contains",
+    "href": "ggseg-atlases.html#what-an-atlas-package-contains",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "What an atlas package contains",
+    "text": "What an atlas package contains\nAn atlas package is a thin wrapper: the atlas object in data/, a function of the same name that returns it, and a data-raw/ script recording how it was built. setup_atlas_repo() lays this out for you.\n\nlibrary(ggsegYeo2011)\n\nyeo7()\natlas_regions(yeo7())"
+  },
+  {
+    "objectID": "ggseg-atlases.html#gotchas",
+    "href": "ggseg-atlases.html#gotchas",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Gotchas",
+    "text": "Gotchas\n\nAtlases are functions: dk(), not dk.\nVertex indices are 0-based; R is 1-based. Add one before indexing a mesh yourself.\nA palette must cover every label, or set_atlas_palette() warns and the uncovered regions fall back to na.value.\nCortical meshes share vertex indices across regions, so they cannot be decimated. Subcortical meshes can.\natlas_region_remove() drops the region everywhere; use atlas_view_remove_region() to drop it from one view only."
+  },
+  {
+    "objectID": "ggseg-atlases.html#learn-more",
+    "href": "ggseg-atlases.html#learn-more",
+    "title": "Brain atlases and data structures :: Cheatsheet",
+    "section": "Learn more",
+    "text": "Learn more\n\nhttps://ggsegverse.github.io — ecosystem documentation\nhttps://ggsegverse.r-universe.dev — every atlas package\nhttps://github.com/ggsegverse — source and issues"
+  },
+  {
+    "objectID": "ggseg3d.html",
+    "href": "ggseg3d.html",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "",
+    "text": "Download PDF"
+  },
+  {
+    "objectID": "ggseg3d.html#a-brain-in-three-dimensions",
+    "href": "ggseg3d.html#a-brain-in-three-dimensions",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "A brain in three dimensions",
+    "text": "A brain in three dimensions\nggseg3d renders an atlas onto a brain mesh and returns an htmlwidget — draggable in RStudio, a Quarto document or a Shiny app.\n\nlibrary(ggseg3d)\n\nggseg3d(atlas = dk()) |&gt;\n  pan_camera(\"left lateral\")\n\nggseg3d(\n  .data = NULL, atlas = dk(),\n  label_by = \"region\", text_by = NULL,\n  colour_by = \"colour\", palette = NULL,\n  na_colour = \"darkgrey\", na_alpha = 1, ...\n)\n\nAtlases are functions: dk(), not dk.\nThe result is a widget. Every option below is a pipe step, not an argument.\nlabel_by sets the hover label, text_by adds a second hover line."
+  },
+  {
+    "objectID": "ggseg3d.html#your-data-on-the-surface",
+    "href": "ggseg3d.html#your-data-on-the-surface",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Your data on the surface",
+    "text": "Your data on the surface\nPass a data frame with a region column and name the column to colour by.\n\nscores &lt;- data.frame(\n  region = c(\"precentral\", \"insula\"),\n  score = c(1.2, -0.4)\n)\n\nggseg3d(\n  .data = scores,\n  atlas = dk(),\n  colour_by = \"score\",\n  palette = c(\"#f2f0ef\", \"#5e3c58\")\n) |&gt;\n  pan_camera(\"left lateral\")\n\n\npalette takes colour names or hex codes, interpolated across the range.\nA named numeric palette pins colours to values: c(\"#f2f0ef\" = 0, \"#5e3c58\" = 3).\nRegions missing from .data take na_colour; na_alpha fades them."
+  },
+  {
+    "objectID": "ggseg3d.html#how-each-atlas-type-is-drawn",
+    "href": "ggseg3d.html#how-each-atlas-type-is-drawn",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "How each atlas type is drawn",
+    "text": "How each atlas type is drawn\n\n\n\nType\nMesh\nColouring\n\n\n\n\ncortical\none shared mesh per hemisphere\nper vertex\n\n\ncerebellar\none shared SUIT mesh\nper vertex\n\n\nsubcortical\none mesh per structure\nper face\n\n\ntract\ntube meshes built at render time\nby orientation\n\n\n\nTract atlases encode direction as colour: red left–right, green anterior–posterior, blue superior–inferior."
+  },
+  {
+    "objectID": "ggseg3d.html#cameras",
+    "href": "ggseg3d.html#cameras",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Cameras",
+    "text": "Cameras\n\nggseg3d(atlas = dk()) |&gt;\n  pan_camera(\"right medial\")\n\n# or an explicit x, y, z position\nggseg3d(atlas = dk()) |&gt;\n  pan_camera(c(-350, 0, 0))\n\nPresets are \"&lt;hemisphere&gt; &lt;view&gt;\", with an underscore accepted in place of the space:\n\n\n\n\nlateral\nmedial\nsuperior\ninferior\nanterior\nposterior\n\n\n\n\nleft\n✓\n✓\n✓\n✓\n✓\n✓\n\n\nright\n✓\n✓\n✓\n✓\n✓\n✓"
+  },
+  {
+    "objectID": "ggseg3d.html#which-hemispheres-and-surfaces",
+    "href": "ggseg3d.html#which-hemispheres-and-surfaces",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Which hemispheres and surfaces",
+    "text": "Which hemispheres and surfaces\n\nggseg3d(atlas = dk(), hemisphere = \"left\")\n\nggseg3d(atlas = dk(), surface = \"pial\")\n\n\"inflated\" is the default and ships with ggseg.formats. The rest come from ggseg.meshes, an optional install:\n\ninstall.packages(\n  \"ggseg.meshes\",\n  repos = \"https://ggsegverse.r-universe.dev\"\n)\n\nggseg.meshes::available_cortical_surfaces()\n#&gt; pial, white, midthickness, semi-inflated,\n#&gt; sphere, smoothwm, orig\n\nggseg.meshes::available_cerebellar_surfaces()\n#&gt; suit_flat\n\nresolve_brain_mesh(hemisphere, surface, brain_meshes) is the single entry point — pass brain_meshes to render on a mesh of your own."
+  },
+  {
+    "objectID": "ggseg3d.html#a-glass-brain-around-a-subcortical-atlas",
+    "href": "ggseg3d.html#a-glass-brain-around-a-subcortical-atlas",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "A glass brain around a subcortical atlas",
+    "text": "A glass brain around a subcortical atlas\n\nggseg3d(atlas = aseg()) |&gt;\n  add_glassbrain(\"left\", opacity = 0.2) |&gt;\n  pan_camera(\"left lateral\")\n\nadd_glassbrain(\n  p, hemisphere = c(\"left\", \"right\"),\n  surface = \"inflated\", colour = \"#CCCCCC\",\n  opacity = 0.3, brain_meshes = NULL\n)"
+  },
+  {
+    "objectID": "ggseg3d.html#widget-options",
+    "href": "ggseg3d.html#widget-options",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Widget options",
+    "text": "Widget options\nEvery one of these takes the widget and returns it, so they chain.\n\nggseg3d(atlas = dk()) |&gt;\n  set_background(\"#1a2a2e\") |&gt;\n  set_edges(colour = \"white\", width = 1) |&gt;\n  set_legend(show = FALSE) |&gt;\n  set_dimensions(width = 800, height = 600) |&gt;\n  set_flat_shading(flat = TRUE) |&gt;\n  set_orthographic(ortho = TRUE, frustum_size = 220) |&gt;\n  set_positioning(\"centered\") |&gt;\n  pan_camera(\"left lateral\")\n\n\n\n\nStep\nDoes\n\n\n\n\nset_background()\ncanvas colour\n\n\nset_edges()\nregion boundary lines\n\n\nset_legend()\nshow or hide the colour legend\n\n\nset_dimensions()\nwidget size in pixels\n\n\nset_flat_shading()\nfaceted rather than smooth shading\n\n\nset_orthographic()\ndrop perspective\n\n\nset_positioning()\n\"anatomical\" or \"centered\""
+  },
+  {
+    "objectID": "ggseg3d.html#saving-a-still-image",
+    "href": "ggseg3d.html#saving-a-still-image",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Saving a still image",
+    "text": "Saving a still image\n\nggseg3d(atlas = dk()) |&gt;\n  pan_camera(\"left lateral\") |&gt;\n  snapshot_brain(\n    \"brain.png\",\n    width = 600, height = 500, zoom = 2\n  )\n\nsnapshot_brain() drives a headless browser, so it needs webshot2 and Chrome. For a plot destined for print, ggsegray() renders the same scene through rgl instead:\n\nggsegray(atlas = dk(), colour_by = \"colour\") |&gt;\n  pan_camera(\"right lateral\")"
+  },
+  {
+    "objectID": "ggseg3d.html#widget-bindings",
+    "href": "ggseg3d.html#widget-bindings",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Widget bindings",
+    "text": "Widget bindings\n\nui &lt;- fluidPage(\n  ggseg3dOutput(\n    \"brain\",\n    width = \"100%\",\n    height = \"600px\"\n  )\n)\n\nserver &lt;- function(input, output, session) {\n  output$brain &lt;- renderGgseg3d({\n    ggseg3d(\n      .data = scores(),\n      atlas = dk(),\n      colour_by = \"score\"\n    )\n  })\n}"
+  },
+  {
+    "objectID": "ggseg3d.html#other-atlases",
+    "href": "ggseg3d.html#other-atlases",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Other atlases",
+    "text": "Other atlases\nEvery atlas on the r-universe works the same way, so long as it carries 3D data. plot(atlas) and the atlas’s own print method say whether it does.\n\ninstall_ggseg_atlas(\"ggsegYeo2011\")\n\nlibrary(ggsegYeo2011)\nggseg3d(atlas = yeo7()) |&gt;\n  pan_camera(\"left lateral\")\n\nA cortical atlas built only from 2D polygons has no vertices, and ggseg3d errors rather than guessing at them."
+  },
+  {
+    "objectID": "ggseg3d.html#cerebellum-and-tracts",
+    "href": "ggseg3d.html#cerebellum-and-tracts",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Cerebellum and tracts",
+    "text": "Cerebellum and tracts\n\n# cerebellum, on the shared SUIT mesh\nggseg3d(atlas = suit())\n\n# tracts, coloured by orientation\nggseg3d(atlas = tracula()) |&gt;\n  add_glassbrain(opacity = 0.1)"
+  },
+  {
+    "objectID": "ggseg3d.html#updating-without-a-redraw",
+    "href": "ggseg3d.html#updating-without-a-redraw",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Updating without a redraw",
+    "text": "Updating without a redraw\nRebuilding the widget reloads the whole mesh. These proxies change one thing in place:\n\nupdateGgseg3dCamera(session, \"brain\", \"right lateral\")\nupdateGgseg3dBackground(session, \"brain\", \"#1a2a2e\")"
+  },
+  {
+    "objectID": "ggseg3d.html#gotchas",
+    "href": "ggseg3d.html#gotchas",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Gotchas",
+    "text": "Gotchas\n\ndk is a function; dk() is the atlas.\nlabel, text and colour were renamed to label_by, text_by and colour_by in 2.1.0. The old names still work, with a warning.\nA widget cannot be printed to PDF. Use snapshot_brain() or ggsegray() for static output.\nCortical meshes share vertex indices across regions and so cannot be decimated; subcortical meshes can.\nAsking for a non-\"inflated\" surface without ggseg.meshes installed is an error, not a silent fallback."
+  },
+  {
+    "objectID": "ggseg3d.html#in-documents",
+    "href": "ggseg3d.html#in-documents",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "In documents",
+    "text": "In documents\nA widget needs a JavaScript-capable output. In Quarto and R Markdown it works in html formats, and in pdf only through a static snapshot:\n\n```{r}\n#| eval: false\nggseg3d(atlas = dk())\n```\n\nGuard it when a document renders to both:\n#| eval: !expr knitr::is_html_output()\nEach widget carries its own copy of the mesh, so a page with many brains gets heavy quickly — prefer one widget the reader can rotate over a grid of static views."
+  },
+  {
+    "objectID": "ggseg3d.html#colour-and-legend",
+    "href": "ggseg3d.html#colour-and-legend",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Colour and legend",
+    "text": "Colour and legend\ncolour_by names the column to map; palette says how.\n\n# interpolated across the data range\npalette = c(\"#f2f0ef\", \"#a8c5cb\", \"#5e3c58\")\n\n# pinned to specific values\npalette = c(\n  \"#f2f0ef\" = 0,\n  \"#a8c5cb\" = 1.5,\n  \"#5e3c58\" = 3\n)\n\nLeave colour_by = \"colour\" — the default — to draw the atlas in its own palette instead. set_legend(FALSE) drops the colour bar when the figure has its own caption."
+  },
+  {
+    "objectID": "ggseg3d.html#hover-text",
+    "href": "ggseg3d.html#hover-text",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Hover text",
+    "text": "Hover text\n\nggseg3d(\n  .data = scores,\n  atlas = dk(),\n  colour_by = \"score\",\n  label_by = \"region\",\n  text_by = \"score\"\n)\n\nlabel_by is the bold first line of the tooltip, text_by a second line below it. Both name columns of .data or of the atlas core."
+  },
+  {
+    "objectID": "ggseg3d.html#d-or-3d",
+    "href": "ggseg3d.html#d-or-3d",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "2D or 3D?",
+    "text": "2D or 3D?\n\n\n\nWant\nReach for\n\n\n\n\na figure for a paper\nggseg\n\n\na brain readers can rotate\nggseg3d\n\n\ncortical surface anatomy\nggseg3d, inflated or pial\n\n\nsubcortical slices\nggseg, aseg()\n\n\nsubcortical volumes in space\nggseg3d, aseg()\n\n\ntract orientation\nggseg3d, tracula()"
+  },
+  {
+    "objectID": "ggseg3d.html#when-nothing-appears",
+    "href": "ggseg3d.html#when-nothing-appears",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "When nothing appears",
+    "text": "When nothing appears\n\nBlank panel in RStudio. The widget needs the Viewer pane; try print() in a browser with htmlwidgets::saveWidget().\nEverything grey. No region in .data matched the atlas. Compare unique(.data$region) with atlas_regions(atlas).\nAn error about vertices. The atlas has 2D geometry only. Use ggseg, or rebuild the atlas with ggseg.extra.\nSlow first draw. The mesh is loaded once per session; later widgets on the same surface are quicker."
+  },
+  {
+    "objectID": "ggseg3d.html#learn-more",
+    "href": "ggseg3d.html#learn-more",
+    "title": "3D brain plotting with ggseg3d :: Cheatsheet",
+    "section": "Learn more",
+    "text": "Learn more\n\nhttps://ggsegverse.github.io — ecosystem documentation\nvignette(\"ggseg3d\") — longer worked examples\nhttps://github.com/ggsegverse/ggseg3d — source and issues"
+  }
+]
